@@ -3,6 +3,7 @@
 #include <string.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 void user_greeting(void);
 
@@ -17,4 +18,5 @@ void user_greeting(void)
 {
     printf("Welcome to SecureLogin!\n");
     printf("Where you credentials are safe with us.\n");
+    sleep(2);
 }
