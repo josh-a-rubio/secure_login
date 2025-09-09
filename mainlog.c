@@ -4,11 +4,17 @@
 #include <limits.h>
 #include <stdbool.h>
 
+void user_greeting(void);
+
 int main(void)
 {
+    user_greeting();
+    return 0;
+}
 
-printf ("securelog proj\n");
-return 0;
-
-
+//login interface
+void user_greeting(void)
+{
+    printf("Welcome to SecureLogin!\n");
+    printf("Where you credentials are safe with us.\n");
 }
