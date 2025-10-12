@@ -6,12 +6,13 @@
 #include <unistd.h>
 
 void user_greeting(void);
-char user_menu(void);
+void user_menu(void);
+void user_signup(void);
 
 int main(void)
 {
     user_greeting();
-    char choice = user_menu();
+    user_menu();
 
     return 0;
     
@@ -25,7 +26,7 @@ void user_greeting(void)
     sleep(2);
 }
 
-char user_menu(void)
+void user_menu(void)
 {
     char choice;
 
@@ -40,10 +41,12 @@ char user_menu(void)
     if (choice == '1') 
     {
         printf("Login selected\n");
+        
     } 
     else if (choice == '2') 
     {
        printf("Sign up selected\n");
+       user_signup();
     } 
     else if (choice == '3')
     {
@@ -53,9 +56,25 @@ char user_menu(void)
     {
         printf("Invalid option. Please try again\n");
     }
-    
-    return choice;
 
 }
-
-
+void user_signup(void)
+{
+    
+    char username[32];
+    char *password;
+    
+    
+    while (getchar() != '\n' && !EOF) 
+    { 
+        //clear stdin 
+    }
+    
+    printf("\nUsername: ");
+    fgets(username, sizeof(username), stdin);
+    username[strcspn(username, "\n" )] = '\0';
+    
+    password = getpass("Password: ");
+    printf("Account created successfully!\n");
+    
+}
