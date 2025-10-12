@@ -4,21 +4,31 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <time.h>
+
+#define SALT_LEN 8
 
 void user_greeting(void);
-void user_menu(void);
-void user_signup(void);
+void user_menu(bool has_account);
+void user_signup(bool *has_account);
+void generate_salt(char *salt, size_t len);
+unsigned long toy_hash(const char *str, const char *salt);
 
 int main(void)
 {
+    srand((unsigned)time(NULL));
+
     user_greeting();
-    user_menu();
+
+    bool has_account = false;
+    user_menu(has_account);
+
 
     return 0;
     
 }
 
-//login interface
+//User gretting
 void user_greeting(void)
 {
     printf("\nWelcome to SecureLogin!\n");
@@ -26,55 +36,142 @@ void user_greeting(void)
     sleep(2);
 }
 
-void user_menu(void)
+//User menu options
+void user_menu(bool has_account)
 {
     char choice;
 
-    printf("\nType the number of your option.\n");
-    printf("1. Login\n");
-    printf("2. Sign up\n");
-    printf("3. Exit\n");
-    printf("\nChoice: ");
+    while (true)
+    {
+        if (!has_account)
+        {
+            printf("\nType the number of your option.\n");
+            printf("1. Login\n");
+            printf("2. Sign up\n");
+            printf("3. Exit\n");
+        }
+        else
+        {
+            printf("\nType the number of your option.\n");
+            printf("1. Login\n");
+            printf("2. Exit\n");
+        }
 
-    scanf(" %c", &choice);
-
-    if (choice == '1') 
-    {
-        printf("Login selected\n");
-        
-    } 
-    else if (choice == '2') 
-    {
-       printf("Sign up selected\n");
-       user_signup();
-    } 
-    else if (choice == '3')
-    {
-        exit(0);
-    } 
-    else
-    {
-        printf("Invalid option. Please try again\n");
+        printf("\nChoice: ");
+        scanf(" %c", &choice);
+         
+        if (!has_account)
+        {
+            if (choice == '1') 
+            {
+                printf("Login selected\n");
+                //cal login
+            } 
+            else if (choice == '2') 
+            {
+                printf("Sign up selected\n");
+                user_signup(&has_account);
+            } 
+            else if (choice == '3')
+            {
+                exit(0);
+            } 
+            else
+            {
+                printf("Invalid option. Please try again\n");
+            }
+        }
+        else
+        {
+            if (choice == '1')
+            {
+                printf("Login selected\n");
+                //cal login
+            }
+            else if (choice == '2')
+            {
+                exit(0);
+            }
+            else
+            {
+                printf("Invalid option. Please try again\n");
+            }
+        }
     }
-
 }
-void user_signup(void)
+
+//User signup
+void user_signup(bool *has_account)
 {
-    
     char username[32];
     char *password;
+    char salt[SALT_LEN + 1];
+    unsigned long hash_value;
     
-    
-    while (getchar() != '\n' && !EOF) 
+    while (getchar() != '\n' && !feof(stdin)) 
     { 
         //clear stdin 
     }
-    
+
     printf("\nUsername: ");
     fgets(username, sizeof(username), stdin);
     username[strcspn(username, "\n" )] = '\0';
     
     password = getpass("Password: ");
+
+    //Generate salt + hash
+    generate_salt(salt, SALT_LEN + 1);
+    hash_value = toy_hash(password, salt);
+
+    //Save to users.txt
+    FILE *fp = fopen("users.txt", "a");
+    if (!fp)
+    {
+        perror("Error opening users.txt");
+        return;
+    }
+
+    fprintf(fp, "%s:%s:%lu\n", username, salt, hash_value);
+    fclose(fp);
+
+    //Clear memory
+    memset(password, 0, strlen(password));
+
     printf("Account created successfully!\n");
-    
+
+    *has_account = true;
+}
+
+//salt generator
+void generate_salt(char *salt, size_t len)
+{
+    const char charset[] = 
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    for (size_t i = 0; i < len - 1 ; i++)
+    {
+        salt[i] = charset[rand() % (sizeof(charset) - 1)];
+    }
+    salt[len -1] = '\0';
+}
+
+//Toy hash (djb2 variant)
+unsigned long toy_hash(const char *str, const char *salt)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    //Mix in the salt first
+    while ((c = *salt++))
+    {
+        hash = (( hash << 5) + hash)+ c;
+    }
+
+    //Mix in the password
+    while ((c = *str++))
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
 }
