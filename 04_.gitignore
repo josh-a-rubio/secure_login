@@ -1,0 +1,12 @@
+# Ignore compiled binaries
+securelogin
+securelogin.exe
+*.o
+*.out
+
+# Ignore runtime credential file
+users.txt
+
+# Optional: editor / IDE files
+.vscode/
+*.swp
