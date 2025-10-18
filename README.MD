@@ -48,6 +48,7 @@ securelogin.exe
 
 ## 💡 Example Session
 
+```
 ### Sign Up
 Choice: 2  
 Username: john_doe  
@@ -66,7 +67,7 @@ Welcome, john_doe
 Username: wrong_user  
 Password: ********  
 Login failed: Invalid username or password.
-
+```
 ---
 
 ## 🏗️ Design Overview
@@ -143,5 +144,6 @@ It is **not** production-grade. Replace toy hashing with Argon2 / bcrypt / scryp
 
 
 This project is distributed under the [MIT License](03_LICENSE). See `03_LICENSE` for full details.
+
 
 
