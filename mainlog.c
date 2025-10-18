@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/stat.h>  
+
+#ifdef _WIN32
+#include <windows.h> 
+#endif
 
 #define SALT_LEN 8
 #define MAX_USERNAME_LEN 31
@@ -18,6 +23,7 @@ bool username_exists(const char *username);
 bool validate_username(const char *username);
 void generate_salt(char *salt, size_t len);
 unsigned long toy_hash(const char *str, const char *salt);
+void user_login(void);
 
 
 int main(void)
@@ -69,7 +75,8 @@ void user_menu(bool has_account)
             if (choice == '1') 
             {
                 printf("Login selected\n");
-                //cal login
+                user_login();
+                exit(0);
             } 
             else if (choice == '2') 
             {
@@ -90,7 +97,8 @@ void user_menu(bool has_account)
             if (choice == '1')
             {
                 printf("Login selected\n");
-                //cal login
+                user_login();
+                exit(0);
             }
             else if (choice == '2')
             {
@@ -183,12 +191,17 @@ void user_signup(bool *has_account)
         memset(password, 0, password_len);
         return;
     }
+    #ifdef _WIN32
+    SetFileAttributes("users.txt", FILE_ATTRIBUTE_HIDDEN);
+    #else
+    chmod("users.txt", 0600);
+    #endif
 
     fprintf(fp, "%s:%s:%lu\n", username, salt, hash_value);
     fclose(fp);
 
     //Clear memory
-    memset(password, 0, strlen(password));
+    memset(password, 0, password_len);
 
     printf("Account created successfully!\n");
 
@@ -273,5 +286,116 @@ unsigned long toy_hash(const char *str, const char *salt)
     return hash;
 }
 
+//User login
+void user_login(void)
+{
+    char username[32];
+    char *password;
+    char salt[SALT_LEN + 1];
+    unsigned long stored_hash;
+    unsigned long input_hash;
+    bool login_success = false;
 
+    while (getchar() != '\n' && !feof(stdin)) 
+    { 
+        //clear stdin 
+    }
 
+    printf("\nUsername: ");
+    fgets(username, sizeof(username), stdin); 
+    
+    size_t len = strlen(username);
+    if (len > 0 && username[len-1] == '\n')
+    {
+        username[len-1] = '\0';
+    }
+    else if (len == sizeof(username) - 1)
+    {
+        while (getchar() != '\n' && !feof(stdin));
+    }
+    
+    // Validate username format
+    if (strlen(username) == 0)
+    {   
+        printf("Login failed: Invalid username or password.\n");
+        return;
+    }
+
+    if (!validate_username(username))
+    {
+        printf("Login failed: Invalid username or password.\n");
+        return;
+    }
+
+    password = getpass("Password: ");
+
+    size_t password_len = strlen(password);
+    if (password_len == 0)
+    {
+        printf("Login failed: Invalid username or password.\n");
+        memset(password, 0, password_len);
+        return;
+    }
+
+    FILE *fp = fopen("users.txt", "r");
+    if (!fp)
+    {
+        printf("Login failed: Invalid username or password.\n");
+        memset(password, 0, password_len);
+        return;
+    }
+
+    char line[256];
+    char stored_username[MAX_USERNAME_LEN + 1];
+    
+    while (fgets(line, sizeof(line), fp))
+    {
+        // Parse line: username:salt:hash
+        if (sscanf(line, "%31[^:]:%8[^:]:%lu", stored_username, salt, &stored_hash) == 3)
+        {
+            if (strcmp(username, stored_username) == 0)
+            {
+                // Username found . Hash the input password with stored salt
+                input_hash = toy_hash(password, salt);
+                
+                // Compare hashes
+                if (input_hash == stored_hash)
+                {
+                    //Art to confirm login before end of prototype
+                    time_t now = time(NULL);
+                    struct tm *t = localtime(&now);
+                    char date_str[20];
+                    char time_str[20];
+                    
+                    strftime(date_str, sizeof(date_str), "%m/%d/%Y", t);
+                    strftime(time_str, sizeof(time_str), "%I:%M %p", t);
+                    
+                    printf("\n");
+                    printf("╔═══════════════════════════════════════╗\n");
+                    printf("║  Date: %-15s                ║\n", date_str);
+                    printf("║  Time: %-15s                ║\n", time_str);
+                    printf("║                                       ║\n");
+                    printf("║      ✓ LOGIN SUCCESSFUL!              ║\n");
+                    printf("║      Welcome, %-23s ║\n", username);
+                    printf("║                                       ║\n");
+                    printf("║    Thanks for testing my program!     ║\n");
+                    printf("╚═══════════════════════════════════════╝\n");
+
+                    login_success = true;
+                }
+                
+                break;
+            }
+        }
+    }
+    
+    // If login failed for any reason
+    if (!login_success)
+    {
+        printf("Login failed: Invalid username or password.\n");
+    }
+
+    fclose(fp);
+    
+    memset(password, 0, password_len);
+}
