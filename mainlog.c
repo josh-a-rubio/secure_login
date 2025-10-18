@@ -7,12 +7,18 @@
 #include <time.h>
 
 #define SALT_LEN 8
+#define MAX_USERNAME_LEN 31
+#define MAX_PASSWORD_LEN 64
+
 
 void user_greeting(void);
 void user_menu(bool has_account);
 void user_signup(bool *has_account);
+bool username_exists(const char *username);
+bool validate_username(const char *username);
 void generate_salt(char *salt, size_t len);
 unsigned long toy_hash(const char *str, const char *salt);
+
 
 int main(void)
 {
@@ -23,17 +29,15 @@ int main(void)
     bool has_account = false;
     user_menu(has_account);
 
-
     return 0;
-    
 }
 
-//User gretting
+//User greeting
 void user_greeting(void)
 {
     printf("\nWelcome to SecureLogin!\n");
     printf("Where your credentials are safe with us.\n");
-    sleep(2);
+    sleep(1);
 }
 
 //User menu options
@@ -113,11 +117,59 @@ void user_signup(bool *has_account)
         //clear stdin 
     }
 
-    printf("\nUsername: ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n" )] = '\0';
+    while (true)
+    {
+         printf("\nUsername: ");
+          fgets(username, sizeof(username), stdin); 
+          size_t len = strlen(username);
+          if (len > 0 && username[len-1] == '\n')
+          {
+            username[len-1] = '\0';
+          }
+          
+          else if (len == sizeof(username) - 1)
+          {
+            printf("Error: Username too long. Limit %d characters.\n", MAX_USERNAME_LEN);
+            while (getchar() != '\n' && !feof(stdin));
+            continue;
+          }
+          
+          if (strlen(username) == 0)
+          {   
+            printf("Error: Username cannot be empty. \n");
+            continue;
+          }
+        
+        if (!validate_username(username))
+        {
+            printf("Error: Username cannot contain colons (:) or spaces. \n");
+            continue;
+        }
+        
+        if (username_exists(username))
+        {
+            printf("Error: Username already exists. Please choose another.\n");
+            continue;
+        }
+        break;
+}
     
     password = getpass("Password: ");
+
+    size_t password_len = strlen(password);
+    if (password_len == 0)
+    {
+        printf("Error: Password cannot be empty. \n");
+        memset(password, 0, password_len);
+        return;
+    }
+
+    if (password_len > MAX_PASSWORD_LEN)
+    {
+        printf("Error: Password too long. limit %d characters. \n", MAX_PASSWORD_LEN);
+        memset(password, 0, password_len);
+        return;
+    }
 
     //Generate salt + hash
     generate_salt(salt, SALT_LEN + 1);
@@ -128,6 +180,7 @@ void user_signup(bool *has_account)
     if (!fp)
     {
         perror("Error opening users.txt");
+        memset(password, 0, password_len);
         return;
     }
 
@@ -142,7 +195,51 @@ void user_signup(bool *has_account)
     *has_account = true;
 }
 
-//salt generator
+//Check if username exists in txt file
+bool username_exists(const char *username)
+{
+    FILE *fp = fopen("users.txt", "r");
+    if (!fp)
+    {
+        return false;
+    }
+    
+    char line[256];
+    char stored_username[MAX_USERNAME_LEN + 1];
+
+    while(fgets(line, sizeof(line), fp))
+    {
+        if (sscanf(line, "%31[^:]", stored_username) == 1)
+        {
+            if (strcmp(username, stored_username) == 0)
+            {
+                fclose(fp);
+                return true;
+            }
+        }
+
+    }
+
+    fclose(fp);
+    return false;
+}
+
+//Validate username - no spaces or colons
+bool validate_username(const char *username)
+{
+    size_t len = strlen(username);
+    for (size_t i = 0; i < len; i++)
+    {
+        if (username[i] == ':' || username[i] == ' ' || username[i] == '\t'
+        || username[i] == '\n' || username[i] == '\r')
+        {
+            return false;
+        }
+    }
+    return true;
+ }
+
+//Salt generator
 void generate_salt(char *salt, size_t len)
 {
     const char charset[] = 
@@ -175,3 +272,6 @@ unsigned long toy_hash(const char *str, const char *salt)
 
     return hash;
 }
+
+
+
