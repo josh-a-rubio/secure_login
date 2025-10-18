@@ -83,9 +83,11 @@ Password: ********
 ║                                       ║
 ║    Thanks for testing my program!     ║
 ╚═══════════════════════════════════════╝
+```
 
-Failed Login attempt:
+## Failed Login attempt
 
+```
 Welcome to SecureLogin!
 Where your credentials are safe with us.
 
@@ -178,6 +180,7 @@ It is **not** production-grade. Replace toy hashing with Argon2 / bcrypt / scryp
 
 
 This project is distributed under the [MIT License](03_LICENSE). See `03_LICENSE` for full details.
+
 
 
 
