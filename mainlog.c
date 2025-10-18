@@ -10,6 +10,7 @@
 #ifdef _WIN32
 #include <windows.h> 
 #endif
+
 #define SALT_LEN 8
 #define MAX_USERNAME_LEN 31
 #define MAX_PASSWORD_LEN 64
