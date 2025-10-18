@@ -83,6 +83,24 @@ Password: ********
 ║                                       ║
 ║    Thanks for testing my program!     ║
 ╚═══════════════════════════════════════╝
+
+Failed Login attempt:
+
+Welcome to SecureLogin!
+Where your credentials are safe with us.
+
+Type the number of your option.
+1. Login
+2. Sign up
+3. Exit
+
+Choice: 1
+Login selected
+
+Username: wrong_user 
+Password: ******** 
+
+Login failed: Invalid username or password.
 ```
 ---
 
@@ -160,6 +178,7 @@ It is **not** production-grade. Replace toy hashing with Argon2 / bcrypt / scryp
 
 
 This project is distributed under the [MIT License](03_LICENSE). See `03_LICENSE` for full details.
+
 
 
 
