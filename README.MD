@@ -49,26 +49,40 @@ securelogin.exe
 ## 💡 Example Session
 
 ```
-Choice: 2  
+Welcome to SecureLogin!
+Where your credentials are safe with us.
+
+Type the number of your option.
+1. Login
+2. Sign up
+3. Exit
+
+Choice: 2
 Sign up selected
 
-Username: john_doe  
-Password: ********  
+Username: john_doe
+Password: ********
 Account created successfully!
 
-Choice: 1  
-Login seclected
+Type the number of your option.
+1. Login
+2. Exit
 
-Username: john_doe  
-Password: ********  
+Choice: 1
+Login selected
 
-✓ LOGIN SUCCESSFUL!  
-Welcome, john_doe
+Username: john_doe
+Password: ********
 
-Failed Login
-Username: wrong_user  
-Password: ********  
-Login failed: Invalid username or password.
+╔═══════════════════════════════════════╗
+║  Date: 10/18/2025                     ║
+║  Time: 02:45 PM                       ║
+║                                       ║
+║      ✓ LOGIN SUCCESSFUL!              ║
+║      Welcome, john_doe                ║
+║                                       ║
+║    Thanks for testing my program!     ║
+╚═══════════════════════════════════════╝
 ```
 ---
 
@@ -146,6 +160,7 @@ It is **not** production-grade. Replace toy hashing with Argon2 / bcrypt / scryp
 
 
 This project is distributed under the [MIT License](03_LICENSE). See `03_LICENSE` for full details.
+
 
 
 
