@@ -97,7 +97,7 @@ Login failed: Invalid username or password.
 | UI / UX        | `user_greeting()`, `user_menu()`          |
 | Authentication | `user_signup()`, `user_login()`          |
 | Validation     | `validate_username()`, `username_exists()`|
-| Crypto         | `generate_salt()`, `toy_hash()`           |
+| Hashing        | `generate_salt()`, `toy_hash()`           |
 
 ---
 
@@ -106,8 +106,9 @@ Login failed: Invalid username or password.
 ```
 securelogin/
 ├── 01_securelogin.c   # Main source code
-├── 02_README.md       # This file
+├── 02_.gitignore      # Ignore runtime files and IDE temp
 ├── 03_LICENSE         # MIT License
+├── README.md          # Project documentation
 └── users.txt          # Generated at runtime (ignored)
 ```
 
@@ -128,7 +129,6 @@ john_doe:aB3xK9mQ:17364821749123456789
 alice123:pL5nR2wY:98765432101234567890
 ```
 
-> **Important:** `users.txt` contains simulated hashes for demo/learning only. Do **not** commit it.
 
 ---
 
@@ -141,4 +141,7 @@ It is **not** production-grade. Replace toy hashing with Argon2 / bcrypt / scryp
 
 ## 📄 License
 
-MIT License — see `03_LICENSE` for details.
+
+This project is distributed under the [MIT License](03_LICENSE). See `03_LICENSE` for full details.
+
+
