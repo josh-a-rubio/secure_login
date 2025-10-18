@@ -5,6 +5,14 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/stat.h>  
+
+#ifdef _WIN32
+#include <windows.h> 
+#endif
+
+
+
 
 #define SALT_LEN 8
 #define MAX_USERNAME_LEN 31
@@ -186,6 +194,11 @@ void user_signup(bool *has_account)
         memset(password, 0, password_len);
         return;
     }
+    #ifdef _WIN32
+    SetFileAttributes("users.txt", FILE_ATTRIBUTE_HIDDEN);
+    #else
+    chmod("users.txt", 0600);
+    #endif
 
     fprintf(fp, "%s:%s:%lu\n", username, salt, hash_value);
     fclose(fp);
@@ -389,12 +402,3 @@ void user_login(void)
     
     memset(password, 0, password_len);
 }
-    
-
-
-    
-
-
-
-
-
