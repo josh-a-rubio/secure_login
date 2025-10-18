@@ -3,3 +3,6 @@ mainlog
 mainlog.exe
 *.o
 *.out
+
+#ignore user data file
+users.txt
